@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrenar Modelo LSM</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+</head>
+<body>
+  <header class="encabezado">
+    <div>
+      <h1>Entrenamiento del modelo</h1>
+      <div class="sub">Dataset → landmarks → red neuronal → modelo/modelo.json</div>
+    </div>
+    <nav><a class="btn" href="index.html">← Volver al traductor</a></nav>
+  </header>
+
+  <main class="contenedor" style="grid-template-columns: 1fr;">
+    <div class="pasos">
+      <section class="panel">
+        <h2>Paso 1 · Extraer landmarks del dataset</h2>
+        <p class="ayuda">Lee las imágenes de <code>dataset/&lt;LETRA&gt;/</code>, detecta la mano con MediaPipe y guarda los 21 puntos de cada una en <code>datos/landmarks_dataset.json</code>. Solo hace falta una vez.</p>
+        <div class="fila">
+          <button class="btn primario" id="btnExtraer">Extraer landmarks</button>
+          <span class="ayuda" id="resumenDataset" style="margin:0"></span>
+        </div>
+        <div class="progreso"><div id="barraExtraer"></div></div>
+        <pre class="log" id="logExtraer">—</pre>
+      </section>
+
+      <section class="panel">
+        <h2>Paso 2 (opcional) · Capturar muestras propias</h2>
+        <p class="ayuda">Si el modelo falla con tu mano o tu cámara, graba algunas muestras tuyas. Se guardan en <code>datos/landmarks_propios.json</code> y se suman al dataset.</p>
+        <div class="fila">
+          <label>Letra <select id="selLetra"></select></label>
+          <label>Muestras <input type="number" id="numMuestras" value="40" min="5" max="300" style="width:80px"></label>
+          <button class="btn" id="btnCamaraCaptura">Activar cámara</button>
+          <button class="btn primario" id="btnCapturar" disabled>Grabar</button>
+          <button class="btn" id="btnBorrarPropias">Borrar muestras propias</button>
+        </div>
+        <div class="camara" style="max-width:520px;margin-top:12px" id="cajaCamara" hidden>
+          <video id="video" playsinline muted></video>
+          <canvas id="lienzo"></canvas>
+        </div>
+        <p class="ayuda" id="resumenPropias" style="margin-top:10px"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Paso 3 · Entrenar y guardar</h2>
+        <div class="fila">
+          <label>Épocas <input type="number" id="numEpocas" value="80" min="5" max="400" style="width:80px"></label>
+          <label>Validación
+            <select id="selValidacion">
+              <option value="persona">Dejar fuera una persona (más honesto)</option>
+              <option value="aleatoria">80/20 aleatoria</option>
+            </select>
+          </label>
+          <button class="btn primario" id="btnEntrenar">Entrenar</button>
+        </div>
+        <div class="progreso"><div id="barraEntrenar"></div></div>
+        <div class="metricas" id="metricas"></div>
+        <pre class="log" id="logEntrenar">—</pre>
+        <h2 style="margin-top:16px">Matriz de confusión (validación)</h2>
+        <div class="tabla-scroll"><table class="confusion" id="confusion"></table></div>
+      </section>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="js/entrenar.js"></script>
+</body>
+</html>

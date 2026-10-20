@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Traductor LSM</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤟</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+</head>
+<body>
+  <header class="encabezado">
+    <div>
+      <h1>Traductor LSM → Texto</h1>
+      <div class="sub">Alfabeto dactilológico de la Lengua de Señas Mexicana · ITT Automatas II</div>
+    </div>
+    <nav>
+      <span class="estado-modelo"><i class="punto" id="puntoModelo"></i><span id="textoModelo">Cargando…</span></span>
+      <a class="btn" href="entrenar.html">Entrenar modelo</a>
+    </nav>
+  </header>
+
+  <main class="contenedor">
+    <section class="columna">
+      <div class="panel">
+        <div class="camara">
+          <video id="video" playsinline muted></video>
+          <canvas id="lienzo"></canvas>
+          <div class="letra-en-vivo">
+            <div class="anillo" id="anillo"><span id="letraVivo">–</span></div>
+            <div class="detalle">
+              <div class="estado" id="estadoVivo">Esperando cámara</div>
+              <div id="confianzaVivo">umbral 85 %</div>
+            </div>
+          </div>
+          <div class="aviso-camara" id="avisoCamara">
+            <div>
+              <div id="textoAvisoCamara">Se necesita acceso a la cámara para reconocer las señas.</div>
+              <button class="btn primario" id="btnCamara">Activar cámara</button>
+            </div>
+          </div>
+        </div>
+        <div class="top3" id="top3"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Alfabeto reconocible</h2>
+        <div class="alfabeto" id="alfabeto"></div>
+        <p class="ayuda" style="margin:10px 0 0">Las letras tachadas (J, K, Ñ, Q, X, Z) llevan movimiento y quedan fuera del alcance del prototipo.</p>
+      </div>
+    </section>
+
+    <section class="columna">
+      <div class="panel">
+        <h2>Traducción</h2>
+        <div class="salida" id="salida"></div>
+        <ul class="historial" id="historial"></ul>
+        <div class="tokens" id="tokens" aria-label="Tokens reconocidos"></div>
+        <div class="controles">
+          <button class="btn" id="btnEspacio">Espacio <kbd>Espacio</kbd></button>
+          <button class="btn" id="btnDeshacer">Deshacer <kbd>⌫</kbd></button>
+          <button class="btn primario" id="btnFinalizar">Finalizar oración <kbd>Enter</kbd></button>
+          <button class="btn" id="btnVoz">🔊 Leer</button>
+          <button class="btn" id="btnCopiar">Copiar</button>
+          <button class="btn" id="btnBorrar">Borrar todo <kbd>Esc</kbd></button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="pestanas" role="tablist">
+          <button role="tab" aria-selected="true" aria-controls="tabArbol" id="pArbol">Árbol de expresión</button>
+          <button role="tab" aria-selected="false" aria-controls="tabSimbolos" id="pSimbolos">Tabla de símbolos</button>
+          <button role="tab" aria-selected="false" aria-controls="tabDirecciones" id="pDirecciones">Tabla de direcciones</button>
+          <button role="tab" aria-selected="false" aria-controls="tabErrores" id="pErrores">Errores <span class="contador" id="contadorErrores" hidden>0</span></button>
+        </div>
+
+        <div role="tabpanel" id="tabArbol">
+          <div class="arbol" id="arbol"></div>
+        </div>
+
+        <div role="tabpanel" id="tabSimbolos" hidden>
+          <div class="tabla-scroll">
+            <table>
+              <thead><tr><th>Nombre</th><th>Tipo</th><th>Categoría</th><th>Ámbito</th><th>Valor actual</th></tr></thead>
+              <tbody id="tablaVariables"></tbody>
+            </table>
+          </div>
+          <h2 style="margin-top:18px">Tokens reconocidos</h2>
+          <div class="tabla-scroll">
+            <table>
+              <thead><tr><th>#</th><th>Lexema</th><th>Token</th><th>Categoría</th><th>Confianza</th><th>Estado</th></tr></thead>
+              <tbody id="tablaTokens"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div role="tabpanel" id="tabDirecciones" hidden>
+          <div class="tabla-scroll">
+            <table>
+              <thead><tr><th>Nombre</th><th>Dirección</th><th>Tamaño</th><th>Almacenamiento</th></tr></thead>
+              <tbody id="tablaDirecciones"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div role="tabpanel" id="tabErrores" hidden>
+          <ul class="lista-errores" id="listaErrores"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>
